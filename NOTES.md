@@ -61,3 +61,10 @@
 - **Surprised me:** Python check for ≥3.12 inside Python is trivially true since we're already running 3.12. The real gate is the bash wrapper's `command -v python3.12` check. Also: `--version` is a top-level flag (not a subcommand) per §11 — `haku --version`, not `haku version`.
 - **Deferred:** nothing
 - **Open questions for Luis:** none — full CLI surface from §9 is now implemented.
+
+## Step 10 — LICENSES.md, README, end-of-run summary audit
+- **Date:** 2026-05-27
+- **Shipped:** `LICENSES.md` (runtime deps + model weights with SPDX identifiers, §2), `README.md` (architecture, pipeline diagrams, models table, memory budget, CLI reference, storage/concurrency design, licensing). Audited end-of-run summary in haku.py — confirmed §12.0 and §12.2 exact messages, cleaned up the quiet/non-quiet gating logic. All 78 tests pass.
+- **Surprised me:** nothing — this was a documentation + audit step.
+- **Deferred:** nothing
+- **Open questions for Luis:** Project is shippable per §25. All 10 steps complete.

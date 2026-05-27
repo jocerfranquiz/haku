@@ -403,7 +403,7 @@ def _cmd_index(args: argparse.Namespace) -> None:  # noqa: PLR0912, PLR0915
         conn.commit()
 
         # End-of-run summary (§12.0, §12.2)
-        total_skipped = skipped_count + skipped_ext
+        # §12.2: failure summary prints even with --quiet
         if failed_count > 0:
             print(
                 f"haku: indexed {indexed_count} files, {failed_count} failed. "
@@ -412,13 +412,15 @@ def _cmd_index(args: argparse.Namespace) -> None:  # noqa: PLR0912, PLR0915
                 file=sys.stderr,
             )
         elif not quiet:
+            total_skipped = skipped_count + skipped_ext
             parts = [f"haku: indexed {indexed_count} files"]
             if total_skipped > 0:
                 parts.append(f" ({total_skipped} skipped)")
             parts.append(".")
             print("".join(parts), file=sys.stderr)
 
-        if indexed_count == 0 and skipped_ext > 0 and failed_count == 0:
+        # §12.0: unsupported-extension summary prints even with --quiet if non-zero
+        if skipped_ext > 0 and indexed_count == 0 and failed_count == 0:
             print(
                 f"haku: indexed 0 files ({skipped_ext} skipped: unsupported extensions).\n"
                 f"      supported: {_SUPPORTED_LIST}",
