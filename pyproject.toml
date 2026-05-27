@@ -10,10 +10,18 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "RET", "N", "PL"]
 
+[tool.ruff.lint.per-file-ignores]
+"engine/test_*.py" = ["PLR2004"]
+# haku.py: E402 (imports after sys.path setup), PLC0415 (lazy imports for heavy deps)
+"engine/haku.py" = ["E402", "PLC0415"]
+# generate_corpus.py: PLC0415 (local imports of optional dev deps)
+"engine/generate_corpus.py" = ["PLC0415"]
+
 [tool.mypy]
 python_version = "3.12"
 strict = true
 warn_unused_ignores = true
+exclude = ["engine/generate_corpus\\.py"]
 
 [tool.pytest.ini_options]
 testpaths = ["engine"]

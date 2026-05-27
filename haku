@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# /haku/haku — see DESIGN.md §8
+set -euo pipefail
+export HAKU_HOME="${HAKU_HOME:-$(cd "$(dirname "$0")" && pwd)}"
+
+# haku init bootstraps the venv + deps before Python can run (§6)
+if [ "${1:-}" = "init" ]; then
+    if ! command -v python3.12 &>/dev/null; then
+        echo "haku: python3.12 not found. Install Python 3.12 and retry." >&2
+        exit 1
+    fi
+    if [ ! -d "$HAKU_HOME/.venv" ]; then
+        echo "haku: creating .venv ..." >&2
+        python3.12 -m venv "$HAKU_HOME/.venv"
+    fi
+    echo "haku: installing dependencies ..." >&2
+    "$HAKU_HOME/.venv/bin/pip" install --quiet -r "$HAKU_HOME/engine/requirements.txt"
+fi
+
+exec "$HAKU_HOME/.venv/bin/python" "$HAKU_HOME/engine/haku.py" "$@"

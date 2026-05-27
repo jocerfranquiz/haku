@@ -1,0 +1,29 @@
+{
+  "embedders": {
+    "qwen3-embedding-0.6b": {
+      "dir": "qwen3-embedding-0.6b",
+      "upstream": "onnx-community/Qwen3-Embedding-0.6B-ONNX",
+      "revision": "c25a394dd583836952667c12f008335071b3f43d",
+      "embedding_dim": 1024,
+      "files": [
+        { "name": "model.onnx",     "sha256": "6d0ea863f78b4a84afa3c7fcba1ec341572b5e28121aef77b7092b1dfdf679c7", "size": "613527539" },
+        { "name": "tokenizer.json", "sha256": "def76fb086971c7867b829c23a26261e38d9d74e02139253b38aeb9df8b4b50a", "size": "11423705" }
+      ]
+    }
+  },
+  "rerankers": {
+    "bge-reranker-v2-m3": {
+      "dir": "bge-reranker-v2-m3",
+      "upstream": "onnx-community/bge-reranker-v2-m3-ONNX",
+      "revision": "6f5ff65298512715a1e669753bc754d2bc8f367b",
+      "files": [
+        { "name": "model.onnx",     "sha256": "912fc1215c2dbff6499700534bd8d31253af01573861abbfc43afd1fab6cce5d", "size": "570727094" },
+        { "name": "tokenizer.json", "sha256": "8bf8afbfd11306bd872018c53bfdf2e160a56f8edbcf49933324404791c148d3", "size": "17082900" }
+      ]
+    }
+  },
+  "defaults": {
+    "embedder": "qwen3-embedding-0.6b",
+    "reranker": "bge-reranker-v2-m3"
+  }
+}

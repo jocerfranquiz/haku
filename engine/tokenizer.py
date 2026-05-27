@@ -25,3 +25,8 @@ def decode(ids: list[int]) -> str:
 
 def count(text: str) -> int:
     return len(encode(text))
+
+
+def get_tokenizer() -> Tokenizer:
+    """Public accessor for embed.py batch encoding. See §14."""
+    return _tk()
