@@ -28,12 +28,12 @@ technical docs. English and Spanish out of the box.
 │  haku (bash)     │  exec .venv/bin/python engine/haku.py "$@"
 └────────┬─────────┘
          │
-┌────────▼──────────────────────────────────────────────┐
-│  haku.py  (single dispatcher)                         │
-│  ├─ subcommands: init | index | search | status | purge│
-│  ├─ shared: config, logging, db handle, tokenizer     │
-│  └─ uses modules below                                │
-└───┬──────────┬──────────┬──────────┬──────────────────┘
+┌────────▼────────────────────────────────────────────────┐
+│  haku.py  (single dispatcher)                           │
+│  ├─ subcommands: init | index | search | status | purge │
+│  ├─ shared: config, logging, db handle, tokenizer       │
+│  └─ uses modules below                                  │
+└───┬──────────┬──────────┬──────────┬────────────────────┘
     │          │          │          │
 ┌───▼────┐ ┌───▼────┐ ┌───▼────┐ ┌───▼─────────┐
 │chunk.py│ │embed.py│ │storage │ │tokenizer.py │
@@ -58,9 +58,9 @@ file → (PDF? → PyMuPDF4LLM → cached .md) → chunk → embed → SQLite
 ### Search pipeline
 
 ```
-query → embed → vec_chunks ANN ──┐
-                                 ├─→ RRF (k=60) → top-20 → rerank → top-N
-query → FTS5 BM25 ──────────────┘              (optional)
+query -> embed -> vec_chunks ANN ───┐
+                                    ├─> RRF (k=60) -> top-20 -> rerank -> top-N
+query -> FTS5 BM25 ─────────────────┘              (optional)
 ```
 
 - Vector side: cosine similarity via sqlite-vec
