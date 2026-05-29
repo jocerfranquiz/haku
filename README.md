@@ -1,4 +1,4 @@
-# haku
+# haku: \{ a private semantic searcher \}
 
 > *Haku* = "search" in Finnish.
 
@@ -8,6 +8,10 @@ natural language — no API keys, no cloud, no GPU.
 
 Built for personal document collections: research papers, notes, books,
 technical docs. English and Spanish out of the box.
+
+## Architecture
+
+![haku architecture](docs/architecture.svg)
 
 ## Why haku
 
@@ -20,10 +24,6 @@ technical docs. English and Spanish out of the box.
 | **Incremental** | `sha256(path\|\|mtime\|\|size)` skip check. Re-indexing a 5k-file corpus after one edit takes seconds. |
 | **Bilingual** | FTS5 with `unicode61 remove_diacritics 2` — `café` matches `cafe`, `niño` matches `nino`. |
 | **Single binary feel** | One `haku` bash entrypoint, transparent venv activation, no daemon. |
-
-## Architecture
-
-![haku architecture](docs/architecture.svg)
 
 ### Pipelines
 
