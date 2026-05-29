@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 640" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, Consolas, monospace">
+  <defs>
+    <marker id="sar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#a89984"/>
+    </marker>
+    <marker id="sar-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#fb4934"/>
+    </marker>
+  </defs>
+
+  <rect width="880" height="640" fill="#282828"/>
+
+  <text x="440" y="36" text-anchor="middle" fill="#ebdbb2" font-size="18" font-weight="600">haku · runtime state machine</text>
+  <text x="440" y="56" text-anchor="middle" fill="#928374" font-size="11">transitions are CLI invocations · lock states from §20 · schema gate from §19</text>
+
+  <!-- ============== ROW 1: Uninitialized → Idle → Indexing ============== -->
+
+  <!-- Start dot -->
+  <circle cx="40" cy="148" r="7" fill="#ebdbb2"/>
+  <line x1="48" y1="148" x2="78" y2="148" stroke="#a89984" stroke-width="1.4" marker-end="url(#sar)"/>
+
+  <!-- Uninitialized -->
+  <rect x="78" y="118" width="180" height="60" rx="10" fill="#3c3836" stroke="#928374" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <text x="168" y="144" text-anchor="middle" fill="#ebdbb2" font-size="13" font-weight="600">Uninitialized</text>
+  <text x="168" y="162" text-anchor="middle" fill="#a89984" font-size="10">no database.db</text>
+
+  <!-- Uninitialized → Idle -->
+  <line x1="258" y1="148" x2="340" y2="148" stroke="#a89984" stroke-width="1.4" marker-end="url(#sar)"/>
+  <text x="299" y="138" text-anchor="middle" fill="#b8bb26" font-size="11">haku init</text>
+  <text x="299" y="168" text-anchor="middle" fill="#928374" font-size="9">bootstrap schema · WAL on</text>
+
+  <!-- Idle (centered) -->
+  <rect x="340" y="110" width="200" height="78" rx="39" fill="#3c3836" stroke="#b8bb26" stroke-width="1.8"/>
+  <text x="440" y="142" text-anchor="middle" fill="#b8bb26" font-size="14" font-weight="700">Idle</text>
+  <text x="440" y="160" text-anchor="middle" fill="#a89984" font-size="10">DB ready · no lock held</text>
+  <text x="440" y="176" text-anchor="middle" fill="#a89984" font-size="10">accepts any subcommand</text>
+
+  <!-- Idle → Indexing -->
+  <line x1="540" y1="138" x2="620" y2="138" stroke="#a89984" stroke-width="1.4" marker-end="url(#sar)"/>
+  <text x="580" y="128" text-anchor="middle" fill="#fe8019" font-size="11">haku index</text>
+
+  <!-- Indexing → Idle -->
+  <line x1="620" y1="160" x2="540" y2="160" stroke="#a89984" stroke-width="1.4" marker-end="url(#sar)"/>
+  <text x="580" y="178" text-anchor="middle" fill="#a89984" font-size="10">done · SIGINT</text>
+
+  <!-- Indexing -->
+  <rect x="620" y="110" width="190" height="78" rx="10" fill="#3c3836" stroke="#fe8019" stroke-width="1.6"/>
+  <text x="715" y="138" text-anchor="middle" fill="#fe8019" font-size="13" font-weight="600">Indexing</text>
+  <text x="715" y="156" text-anchor="middle" fill="#a89984" font-size="10">fcntl.flock held</text>
+  <text x="715" y="172" text-anchor="middle" fill="#a89984" font-size="10">writers serialised</text>
+
+  <!-- ============== ROW 2: Idle → Searching / Purging ============== -->
+
+  <!-- Idle → Searching (down-right) -->
+  <path d="M 510 188 C 540 230, 600 260, 630 280" fill="none" stroke="#a89984" stroke-width="1.4" marker-end="url(#sar)"/>
+  <text x="612" y="244" text-anchor="middle" fill="#83a598" font-size="11">haku search</text>
+
+  <!-- Searching → Idle (up-left curve) -->
+  <path d="M 656 280 C 600 240, 540 200, 500 188" fill="none" stroke="#a89984" stroke-width="1.4" marker-end="url(#sar)"/>
+  <text x="520" y="262" text-anchor="middle" fill="#a89984" font-size="10">results emitted</text>
+
+  <!-- Idle → Purging (down-left) -->
+  <path d="M 410 188 C 380 230, 320 260, 290 280" fill="none" stroke="#a89984" stroke-width="1.4" marker-end="url(#sar)"/>
+  <text x="312" y="244" text-anchor="middle" fill="#d3869b" font-size="11">haku purge</text>
+
+  <!-- Purging → Idle -->
+  <path d="M 268 280 C 320 240, 380 200, 420 188" fill="none" stroke="#a89984" stroke-width="1.4" marker-end="url(#sar)"/>
+  <text x="396" y="262" text-anchor="middle" fill="#a89984" font-size="10">cascade complete</text>
+
+  <!-- Searching (lower-right) -->
+  <rect x="600" y="290" width="220" height="80" rx="10" fill="#3c3836" stroke="#83a598" stroke-width="1.6"/>
+  <text x="710" y="318" text-anchor="middle" fill="#83a598" font-size="13" font-weight="600">Searching</text>
+  <text x="710" y="338" text-anchor="middle" fill="#a89984" font-size="10">lock-free · WAL reader</text>
+  <text x="710" y="354" text-anchor="middle" fill="#a89984" font-size="10">concurrent with Indexing</text>
+
+  <!-- Purging (lower-left) -->
+  <rect x="80" y="290" width="220" height="80" rx="10" fill="#3c3836" stroke="#d3869b" stroke-width="1.6"/>
+  <text x="190" y="318" text-anchor="middle" fill="#d3869b" font-size="13" font-weight="600">Purging</text>
+  <text x="190" y="338" text-anchor="middle" fill="#a89984" font-size="10">fcntl.flock held</text>
+  <text x="190" y="354" text-anchor="middle" fill="#a89984" font-size="10">cascade delete</text>
+
+  <!-- Searching can coexist with Indexing (dashed annotation) -->
+  <path d="M 760 290 C 780 250, 790 210, 780 188" fill="none" stroke="#665c54" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="838" y="240" text-anchor="middle" fill="#665c54" font-size="9">coexists</text>
+
+  <!-- ============== ROW 3: Terminal & error states ============== -->
+
+  <!-- Refuse / terminal -->
+  <rect x="80" y="446" width="280" height="92" rx="10" fill="#1d2021" stroke="#fb4934" stroke-width="1.6"/>
+  <text x="220" y="472" text-anchor="middle" fill="#fb4934" font-size="13" font-weight="600">Refuse (terminal)</text>
+  <text x="220" y="492" text-anchor="middle" fill="#a89984" font-size="10">schema version mismatch (§19)</text>
+  <text x="220" y="508" text-anchor="middle" fill="#a89984" font-size="10">model SHA mismatch (§15)</text>
+  <text x="220" y="524" text-anchor="middle" fill="#a89984" font-size="10">exit non-zero · no auto-fix</text>
+
+  <!-- arrow from Idle area to Refuse -->
+  <path d="M 360 188 C 320 280, 260 380, 220 444" fill="none" stroke="#fb4934" stroke-width="1.3" stroke-dasharray="6,4" marker-end="url(#sar-r)"/>
+  <text x="318" y="408" text-anchor="middle" fill="#fb4934" font-size="10">integrity check fail</text>
+
+  <!-- Lock contention -->
+  <rect x="500" y="446" width="320" height="92" rx="10" fill="#1d2021" stroke="#fabd2f" stroke-width="1.4" stroke-dasharray="5,3"/>
+  <text x="660" y="472" text-anchor="middle" fill="#fabd2f" font-size="13" font-weight="600">Lock contention (transient)</text>
+  <text x="660" y="492" text-anchor="middle" fill="#a89984" font-size="10">second `index` / `purge` fails fast</text>
+  <text x="660" y="508" text-anchor="middle" fill="#a89984" font-size="10">"indexer already running" (§20)</text>
+  <text x="660" y="524" text-anchor="middle" fill="#a89984" font-size="10">`search` continues, prints warning</text>
+
+  <!-- dashed connectors from lock-holding states to lock-contention box -->
+  <path d="M 715 188 C 720 280, 680 380, 660 444" fill="none" stroke="#665c54" stroke-width="1" stroke-dasharray="3,3"/>
+  <path d="M 220 370 C 320 400, 540 420, 600 444" fill="none" stroke="#665c54" stroke-width="1" stroke-dasharray="3,3"/>
+
+  <!-- footnote -->
+  <text x="40" y="588" fill="#928374" font-size="10">note: `haku status` reads model manifest + DB stats — no state change · runs from Idle</text>
+
+  <!-- watermark -->
+  <g opacity="0.35">
+    <text x="864" y="616" text-anchor="end" fill="#ebdbb2" font-size="13" font-weight="700" letter-spacing="3">haku</text>
+    <text x="864" y="630" text-anchor="end" fill="#928374" font-size="9" letter-spacing="2">Jocer Franquiz</text>
+  </g>
+</svg>

@@ -23,46 +23,16 @@ technical docs. English and Spanish out of the box.
 
 ## Architecture
 
-```
-┌──────────────────┐
-│  haku (bash)     │  exec .venv/bin/python engine/haku.py "$@"
-└────────┬─────────┘
-         │
-┌────────▼────────────────────────────────────────────────┐
-│  haku.py  (single dispatcher)                           │
-│  ├─ subcommands: init | index | search | status | purge │
-│  ├─ shared: config, logging, db handle, tokenizer       │
-│  └─ uses modules below                                  │
-└───┬──────────┬──────────┬──────────┬────────────────────┘
-    │          │          │          │
-┌───▼────┐ ┌───▼────┐ ┌───▼────┐ ┌───▼─────────┐
-│chunk.py│ │embed.py│ │storage │ │tokenizer.py │
-│  ~95 L │ │ (ONNX) │ │  .py   │ │ (shared)    │
-└────────┘ └────────┘ └────────┘ └─────────────┘
-```
+![haku architecture](docs/architecture.svg)
 
-### Indexing pipeline
+### Pipelines
 
-```
-file → (PDF? → PyMuPDF4LLM → cached .md) → chunk → embed → SQLite
-                                                             ├─ files
-                                                             ├─ chunks + vec_chunks (ANN)
-                                                             └─ fts_chunks (BM25)
-```
+![haku pipelines](docs/pipelines.svg)
 
 - Chunker: custom ~95-line H2-boundary + paragraph-packing splitter with token-budget overlap
 - Embedder: Qwen3-Embedding-0.6B (INT8, ONNX Runtime, last-token pooling, 1024-dim)
 - PDF conversion parallelized with `ThreadPoolExecutor`
 - Per-file atomic transactions — partial files never land in the DB
-
-### Search pipeline
-
-```
-query -> embed -> vec_chunks ANN ───┐
-                                    ├─> RRF (k=60) -> top-20 -> rerank -> top-N
-query -> FTS5 BM25 ─────────────────┘              (optional)
-```
-
 - Vector side: cosine similarity via sqlite-vec
 - Lexical side: FTS5 BM25 with diacritics-aware unicode61 tokenizer
 - Reranker: bge-reranker-v2-m3 cross-encoder (on by default, `--no-rerank` to skip)
@@ -141,6 +111,80 @@ haku search "turing test" --format json | jq -r '.results[0].path' | xargs xdg-o
 - Python 3.12
 - ~1.2 GB disk for ONNX models
 - Linux (uses `fcntl.flock`; macOS may work but is untested)
+
+## Installation
+
+`haku` is a single-user, per-machine CLI. No daemon, no service, no package
+registry — clone, drop the models in place, and `init`.
+
+### 1. Clone
+
+```bash
+git clone https://github.com/jocerfranquiz/haku.git /haku
+# or anywhere you like:
+git clone https://github.com/jocerfranquiz/haku.git ~/code/haku
+export HAKU_HOME=~/code/haku    # only needed if not at /haku
+```
+
+The bash wrapper resolves `HAKU_HOME` and exports it to Python; everything
+under that root is self-contained.
+
+### 2. Place the models
+
+Models are **not** bundled and **not** auto-downloaded. Follow
+[`MODELS.md`](MODELS.md) to fetch the two ONNX repos at their pinned commit
+revisions and lay them out as:
+
+```
+$HAKU_HOME/models/
+├── Qwen3-Embedding-0.6B/
+│   ├── onnx/model_int8.onnx
+│   └── tokenizer.json
+└── bge-reranker-v2-m3/
+    ├── onnx/model_quantized.onnx
+    └── tokenizer.json
+```
+
+Hashes are pinned in `engine/manifest.json` and verified at load time.
+
+### 3. Bootstrap
+
+```bash
+$HAKU_HOME/haku init
+```
+
+The bash wrapper checks for `python3.12`, creates `$HAKU_HOME/.venv`, installs
+`engine/requirements.txt` into it, then hands off to Python to create the
+SQLite database, FTS5 indexes, and runtime directories. Idempotent — safe to
+re-run.
+
+### 4. (Optional) Put `haku` on your `PATH`
+
+```bash
+ln -s $HAKU_HOME/haku ~/.local/bin/haku
+```
+
+### 5. Smoke test
+
+```bash
+haku --version --full        # prints model revisions + SHA-256s
+haku status                  # verifies model integrity + DB stats
+haku index --files ~/notes
+haku search "your query"
+```
+
+### Uninstall
+
+```bash
+rm -rf $HAKU_HOME            # repo, venv, DB, models, logs — all under one root
+```
+
+### Multi-machine
+
+Each machine gets its own clone, its own `.venv`, its own model copies, and
+its own DB. There is no shared-index or remote-query mode — by design (§1).
+To migrate an existing index, copy `database.db*` and `markdowns/` to the new
+machine's `$HAKU_HOME`; schema version must match (§19).
 
 ## Licensing
 

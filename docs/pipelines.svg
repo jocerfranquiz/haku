@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 640" font-family="ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, Consolas, monospace">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#928374"/>
+    </marker>
+  </defs>
+
+  <rect width="940" height="640" fill="#282828"/>
+
+  <text x="470" y="36" text-anchor="middle" fill="#ebdbb2" font-size="18" font-weight="600">haku · pipelines</text>
+  <text x="470" y="56" text-anchor="middle" fill="#928374" font-size="11">indexing  ·  hybrid search with optional rerank</text>
+
+  <!-- =================== INDEXING PIPELINE =================== -->
+  <g>
+    <text x="40" y="100" fill="#fabd2f" font-size="14" font-weight="600">▸ indexing</text>
+    <text x="40" y="118" fill="#a89984" font-size="11">haku index --files PATH ...</text>
+
+    <!-- file source : widen to 150, 2-line text -->
+    <rect x="38" y="146" width="150" height="64" rx="6" fill="#3c3836" stroke="#83a598" stroke-width="1.3"/>
+    <text x="113" y="170" text-anchor="middle" fill="#83a598" font-size="12" font-weight="600">file</text>
+    <text x="113" y="188" text-anchor="middle" fill="#a89984" font-size="10">.txt · .md · .pdf</text>
+    <text x="113" y="202" text-anchor="middle" fill="#a89984" font-size="10">.html · .docx</text>
+
+    <line x1="188" y1="178" x2="218" y2="178" stroke="#928374" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <!-- extract -->
+    <rect x="218" y="146" width="140" height="64" rx="6" fill="#3c3836" stroke="#fe8019" stroke-width="1.3"/>
+    <text x="288" y="170" text-anchor="middle" fill="#fe8019" font-size="12" font-weight="600">extract</text>
+    <text x="288" y="188" text-anchor="middle" fill="#a89984" font-size="10">PDF → cached .md</text>
+    <text x="288" y="202" text-anchor="middle" fill="#a89984" font-size="10">HTML/DOCX → text</text>
+
+    <line x1="358" y1="178" x2="388" y2="178" stroke="#928374" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <!-- chunk : widen to 150 -->
+    <rect x="388" y="146" width="150" height="64" rx="6" fill="#3c3836" stroke="#b8bb26" stroke-width="1.3"/>
+    <text x="463" y="170" text-anchor="middle" fill="#b8bb26" font-size="12" font-weight="600">chunk</text>
+    <text x="463" y="188" text-anchor="middle" fill="#a89984" font-size="10">512 tok · overlap 64</text>
+    <text x="463" y="202" text-anchor="middle" fill="#a89984" font-size="10">H2 + para pack</text>
+
+    <line x1="538" y1="178" x2="568" y2="178" stroke="#928374" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <!-- embed -->
+    <rect x="568" y="146" width="140" height="64" rx="6" fill="#3c3836" stroke="#d3869b" stroke-width="1.3"/>
+    <text x="638" y="170" text-anchor="middle" fill="#d3869b" font-size="12" font-weight="600">embed</text>
+    <text x="638" y="188" text-anchor="middle" fill="#a89984" font-size="10">Qwen3 · 1024-d</text>
+    <text x="638" y="202" text-anchor="middle" fill="#a89984" font-size="10">L2-normalised</text>
+
+    <line x1="708" y1="178" x2="738" y2="178" stroke="#928374" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <!-- SQLite container -->
+    <rect x="738" y="120" width="200" height="118" rx="8" fill="#1d2021" stroke="#8ec07c" stroke-width="1.4"/>
+    <text x="838" y="142" text-anchor="middle" fill="#8ec07c" font-size="12" font-weight="600">database.db (WAL)</text>
+    <rect x="752" y="156" width="172" height="20" rx="3" fill="#3c3836"/>
+    <text x="760" y="170" fill="#ebdbb2" font-size="10">files (path · hash · mtime)</text>
+    <rect x="752" y="180" width="172" height="20" rx="3" fill="#3c3836"/>
+    <text x="760" y="194" fill="#ebdbb2" font-size="10">chunks + vec_chunks ANN</text>
+    <rect x="752" y="204" width="172" height="20" rx="3" fill="#3c3836"/>
+    <text x="760" y="218" fill="#ebdbb2" font-size="10">fts_chunks BM25</text>
+
+    <!-- indexing footer notes -->
+    <text x="40" y="266" fill="#a89984" font-size="11">• per-file atomic transaction  ·  partial files never land</text>
+    <text x="40" y="284" fill="#a89984" font-size="11">• fcntl.flock (exclusive, non-blocking)  ·  one indexer at a time</text>
+    <text x="40" y="302" fill="#a89984" font-size="11">• sha256(path‖mtime‖size) skip check for incremental re-runs</text>
+  </g>
+
+  <!-- divider -->
+  <line x1="40" y1="334" x2="900" y2="334" stroke="#3c3836" stroke-width="1"/>
+
+  <!-- =================== SEARCH PIPELINE =================== -->
+  <g>
+    <text x="40" y="366" fill="#fabd2f" font-size="14" font-weight="600">▸ hybrid search</text>
+    <text x="40" y="384" fill="#a89984" font-size="11">haku search QUERY [--no-rerank] [--top N]</text>
+
+    <!-- query node -->
+    <rect x="38" y="426" width="140" height="58" rx="6" fill="#3c3836" stroke="#83a598" stroke-width="1.3"/>
+    <text x="108" y="452" text-anchor="middle" fill="#83a598" font-size="12" font-weight="600">query</text>
+    <text x="108" y="470" text-anchor="middle" fill="#a89984" font-size="10">natural language</text>
+
+    <!-- split: top path embed, bottom path FTS5 -->
+    <path d="M 178 446 C 200 446, 200 418, 220 418" fill="none" stroke="#928374" stroke-width="1.4" marker-end="url(#ar)"/>
+    <path d="M 178 462 C 200 462, 200 490, 220 490" fill="none" stroke="#928374" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <!-- top: embed → vec ANN -->
+    <rect x="220" y="392" width="130" height="52" rx="6" fill="#3c3836" stroke="#d3869b" stroke-width="1.3"/>
+    <text x="285" y="416" text-anchor="middle" fill="#d3869b" font-size="12" font-weight="600">embed</text>
+    <text x="285" y="432" text-anchor="middle" fill="#a89984" font-size="10">Qwen3 (query)</text>
+
+    <line x1="350" y1="418" x2="380" y2="418" stroke="#928374" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <rect x="380" y="392" width="140" height="52" rx="6" fill="#3c3836" stroke="#8ec07c" stroke-width="1.3"/>
+    <text x="450" y="416" text-anchor="middle" fill="#8ec07c" font-size="12" font-weight="600">vec_chunks ANN</text>
+    <text x="450" y="432" text-anchor="middle" fill="#a89984" font-size="10">cosine · top-K</text>
+
+    <!-- bottom: FTS5 -->
+    <rect x="220" y="464" width="130" height="52" rx="6" fill="#3c3836" stroke="#fe8019" stroke-width="1.3"/>
+    <text x="285" y="488" text-anchor="middle" fill="#fe8019" font-size="12" font-weight="600">FTS5 BM25</text>
+    <text x="285" y="504" text-anchor="middle" fill="#a89984" font-size="10">diacritics-folded</text>
+
+    <line x1="350" y1="490" x2="380" y2="490" stroke="#928374" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <rect x="380" y="464" width="140" height="52" rx="6" fill="#3c3836" stroke="#8ec07c" stroke-width="1.3"/>
+    <text x="450" y="488" text-anchor="middle" fill="#8ec07c" font-size="12" font-weight="600">fts_chunks</text>
+    <text x="450" y="504" text-anchor="middle" fill="#a89984" font-size="10">lexical · top-K</text>
+
+    <!-- merge to RRF -->
+    <path d="M 520 418 C 550 418, 550 454, 580 454" fill="none" stroke="#928374" stroke-width="1.4" marker-end="url(#ar)"/>
+    <path d="M 520 490 C 550 490, 550 454, 580 454" fill="none" stroke="#928374" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <!-- RRF -->
+    <rect x="580" y="428" width="120" height="52" rx="6" fill="#3c3836" stroke="#fabd2f" stroke-width="1.4"/>
+    <text x="640" y="452" text-anchor="middle" fill="#fabd2f" font-size="12" font-weight="600">RRF</text>
+    <text x="640" y="468" text-anchor="middle" fill="#a89984" font-size="10">k = 60 · top-20</text>
+
+    <line x1="700" y1="454" x2="730" y2="454" stroke="#928374" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <!-- rerank (dashed = optional) -->
+    <rect x="730" y="428" width="130" height="52" rx="6" fill="#3c3836" stroke="#d3869b" stroke-width="1.4" stroke-dasharray="5,3"/>
+    <text x="795" y="452" text-anchor="middle" fill="#d3869b" font-size="12" font-weight="600">rerank</text>
+    <text x="795" y="468" text-anchor="middle" fill="#a89984" font-size="10">bge cross-encoder</text>
+
+    <line x1="860" y1="454" x2="890" y2="454" stroke="#928374" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <!-- top-N output -->
+    <rect x="890" y="428" width="46" height="52" rx="6" fill="#1d2021" stroke="#b8bb26" stroke-width="1.4"/>
+    <text x="913" y="452" text-anchor="middle" fill="#b8bb26" font-size="12" font-weight="600">top-N</text>
+
+    <!-- search footer notes -->
+    <text x="40" y="548" fill="#a89984" font-size="11">• vector + lexical recall paths are independent (no cross-talk before RRF)</text>
+    <text x="40" y="566" fill="#a89984" font-size="11">• score_kind = "rerank" by default · "rrf" when --no-rerank</text>
+    <text x="40" y="584" fill="#a89984" font-size="11">• lock-free reader · warns if indexer lock is held</text>
+  </g>
+
+  <!-- watermark -->
+  <g opacity="0.35">
+    <text x="924" y="616" text-anchor="end" fill="#ebdbb2" font-size="13" font-weight="700" letter-spacing="3">haku</text>
+    <text x="924" y="630" text-anchor="end" fill="#928374" font-size="9" letter-spacing="2">Jocer Franquiz</text>
+  </g>
+</svg>
