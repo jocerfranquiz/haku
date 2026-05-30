@@ -1,4 +1,8 @@
-🚨 THIS PRODUCT IS STILL A PROOF OF CONCEPT. IT WAS IMPLEMENTED IN ONE WEEKEND. USE AT YOUR OWN DISCRETION.
+🚨 THIS PRODUCT IS STILL A PROOF OF CONCEPT.
+
+This software is provided AS-IS with no warranty, either express or implied.  USE AT YOUR OWN DISCRETION.
+
+---
 
 # haku: \{ a private semantic searcher \}
 
