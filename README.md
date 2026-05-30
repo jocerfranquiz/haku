@@ -1,3 +1,5 @@
+🚨 THIS PRODUCT IS STILL A PROOF OF CONCEPT. IT WAS IMPLEMENTED IN ONE WEEKEND. USE AT YOUR OWN DISCRETION.
+
 # haku: \{ a private semantic searcher \}
 
 > *Haku* = "search" in Finnish.
